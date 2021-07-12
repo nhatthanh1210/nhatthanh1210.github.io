@@ -22,9 +22,15 @@
     <button onclick="startRecording()">start</button><br />
     <video id="video_stream" autoplay playsinline muted></video>
     <video id="video_show" class="hide" controls playsinline muted></video>
-    <input type="file" accept=" video/*" capture="environment" onchange="uploadFileVideo()" />
+    <input
+      type="file"
+      accept=" video/*"
+      capture="environment"
+      onchange="uploadFileVideo()"
+    />
 
     <script>
+      alert(window.MediaRecorder);
       const uploadFileVideo = (e) => {
         const videoShow = document.querySelector("#video_show");
         const fileInput = document.querySelector("input");
