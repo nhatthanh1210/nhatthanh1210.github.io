@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <!-- recommended -->
-    <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
     <style>
+      video {
+        width: 300px;
+      }
       .show {
         display: block;
       }
@@ -18,73 +20,59 @@
     </style>
   </head>
   <body>
-    <h1>1</h1>
+    <h1>2</h1>
     <button onclick="startRecording()">start</button><br />
     <video id="video_stream" autoplay playsinline muted></video>
     <video id="video_show" class="hide" controls playsinline muted></video>
-    <input
-      type="file"
-      accept=" video/*"
-      capture="environment"
-      onchange="uploadFileVideo()"
-    />
 
     <script>
-      alert(window.MediaRecorder);
-      const uploadFileVideo = (e) => {
-        const videoShow = document.querySelector("#video_show");
-        const fileInput = document.querySelector("input");
-        const file = fileInput.files[0];
-        const objectURL = URL.createObjectURL(file);
-
-        videoShow.classList.remove("hide");
-        videoShow.src = objectURL;
-      };
+      console.log(window.MediaRecorder);
 
       const startRecording = async () => {
-        console.log(navigator.mediaDevices);
-        console.log(navigator.mediaDevices.getUserMedia);
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia)
-          return;
+        if (!navigator.mediaDevices.getUserMedia) return;
 
-        navigator.mediaDevices
-          .getUserMedia({
-            video: true,
-          })
-          .then((stream) => {
-            const videoStream = document.querySelector("#video_stream");
-            const videoShow = document.querySelector("#video_show");
-            const RecordRTCObj = RecordRTC(stream, {
-              type: "video",
-              mimeType: "video/mp4",
-            });
+        let blobs = [];
+        let stream;
+        let mediaRecorder;
+        const videoStream = document.querySelector("#video_stream");
+        const videoShow = document.querySelector("#video_show");
 
-            videoStream.srcObject = stream;
-            RecordRTCObj.startRecording();
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
 
-            setTimeout(() => {
-              RecordRTCObj.stopRecording(() => {
-                const blob = RecordRTCObj.getBlob();
-                const videoFile = new File([blob], `fileName.mp4`, {
-                  type: "video/mp4",
-                });
-                const objectURL = URL.createObjectURL(videoFile);
+        mediaRecorder = new MediaRecorder(stream);
 
-                console.log(blob);
-                console.log(videoFile);
-                console.log(objectURL);
+        videoStream.srcObject = stream;
+        videoStream.onloadedmetadata = function (e) {
+          videoStream.play();
+        };
 
-                videoStream.srcObject = null;
-                videoStream.classList.add("hide");
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data) blobs.push(event.data);
+        };
 
-                videoShow.classList.remove("hide");
-                videoShow.src = objectURL;
-              });
-            }, 3000);
-          })
-          .catch((err) => {
-            console.log(err);
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(blobs, { type: mediaRecorder.mimeType });
+          const videoFile = new File([blob], `fileName.mp4`, {
+            type: "video/mp4",
           });
+          const objectURL = URL.createObjectURL(videoFile);
+
+          videoShow.classList.remove("hide");
+          videoShow.src = objectURL;
+
+          console.log(blob);
+          console.log(videoFile);
+          console.log(objectURL);
+        };
+
+        mediaRecorder.start();
+
+        setTimeout(() => {
+          mediaRecorder.stop();
+          stream.getTracks().forEach((track) => track.stop());
+        }, 3000);
       };
     </script>
   </body>
