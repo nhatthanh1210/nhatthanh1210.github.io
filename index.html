@@ -26,7 +26,7 @@
     <video id="video_show" class="hide" controls playsinline muted></video>
 
     <script>
-      console.log(window.MediaRecorder);
+      alert(window.MediaRecorder);
 
       const startRecording = async () => {
         if (!navigator.mediaDevices.getUserMedia) return;
@@ -54,8 +54,8 @@
 
         mediaRecorder.onstop = () => {
           const blob = new Blob(blobs, { type: mediaRecorder.mimeType });
-          const videoFile = new File([blob], `fileName.mp4`, {
-            type: "video/mp4",
+          const videoFile = new File([blob], `fileName.webm`, {
+            type: "video/webm;codecs=vp8",
           });
           const objectURL = URL.createObjectURL(videoFile);
 
