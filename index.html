@@ -20,13 +20,13 @@
     </style>
   </head>
   <body>
-    <h1>2</h1>
+    <h1>1</h1>
     <button onclick="startRecording()">start</button><br />
     <video id="video_stream" autoplay playsinline muted></video>
     <video id="video_show" class="hide" controls playsinline muted></video>
 
     <script>
-      alert(window.MediaRecorder);
+      // alert(window.MediaRecorder);
 
       const startRecording = async () => {
         if (!navigator.mediaDevices.getUserMedia) return;
